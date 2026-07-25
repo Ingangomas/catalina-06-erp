@@ -1,20 +1,28 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import DashboardLayout from "@/components/DashboardLayout";
+import DashboardPage from "@/pages/DashboardPage";
+import ExpensesPage from "@/pages/ExpensesPage";
 import NotFound from "@/pages/NotFound";
+import ReportsPage from "@/pages/ReportsPage";
+import TeamPage from "@/pages/TeamPage";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
   return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+    <DashboardLayout>
+      <Switch>
+        <Route path={"/"} component={DashboardPage} />
+        <Route path={"/gastos"} component={ExpensesPage} />
+        <Route path={"/reportes"} component={ReportsPage} />
+        <Route path={"/equipo"} component={TeamPage} />
+        <Route path={"/404"} component={NotFound} />
+        <Route component={NotFound} />
+      </Switch>
+    </DashboardLayout>
   );
 }
 

@@ -1,0 +1,26 @@
+# Project TODO
+
+- [x] Extender los roles de usuario a Socio 1 (Ing. Angomas), Socio 2 (Ing. Johan) y Contador, con permisos aplicados en servidor y cliente.
+- [x] Definir las tablas Drizzle y la migración MySQL para categorías, gastos, facturas/evidencias y aprobaciones con auditoría básica.
+- [x] Crear las cinco categorías exactas: Materiales, Mano de Obra, Transporte, Botes y Otros.
+- [x] Implementar el registro de gastos con descripción, monto, fecha, categoría, tipo de gasto y mes.
+- [x] Aplicar las etiquetas exactas de tipo de gasto: Socio 1, Socio 2 y Global/Compartido.
+- [x] Implementar la carga y el archivo mensual de facturas o recibos JPG, PNG y PDF mediante S3.
+- [x] Restringir la vista de gastos para que cada socio vea solo sus propios registros y Contador/Admin vea todos los registros.
+- [x] Implementar el flujo de envío, aprobación o rechazo de gastos, incluyendo comentarios del Contador y estado visible para los socios.
+- [x] Crear agregaciones de datos del lado del servidor para resúmenes financieros mensuales.
+- [x] Incorporar Polars mediante un subproceso de Python para generar reportes mensuales estructurados.
+- [x] Implementar la descarga de reportes mensuales con gastos de ambos socios, gastos globales y total general.
+- [x] Instalar e integrar Frappe Charts para gráfico de barras por categoría, línea de tendencia mensual y distribución circular por tipo de gasto.
+- [x] Construir un tablero financiero responsive con métricas del mes, estados de aprobación y filtros mensuales.
+- [x] Diseñar una interfaz financiera clara y funcional con navegación lateral, estados vacíos y accesibilidad básica.
+- [x] Crear y ejecutar pruebas Vitest para permisos, cálculos de resumen y validaciones críticas.
+- [x] Verificar visualmente el flujo principal, revisar errores de compilación y actualizar este registro como completado.
+- [ ] Guardar un checkpoint de la primera versión completa y entregar el acceso al prototipo.
+- [x] Aplicar permisos por rol en la interfaz, incluyendo navegación y acciones visibles para socios, Contador y Administrador.
+- [x] Mostrar en la interfaz los nombres exactos de los roles y verificar la coherencia entre restricciones de cliente y servidor.
+- [x] Cubrir con Vitest las restricciones de roles y las agregaciones de reportes generadas por Polars.
+- [x] Preparar el entorno de producción con Python y Polars mediante una imagen de despliegue compatible.
+- [x] Mostrar y permitir seleccionar explícitamente el mes del gasto dentro del formulario de registro, con validación de cliente y servidor.
+- [x] Incorporar el socio responsable del gasto al modelo y filtrar las vistas de socios por dicha pertenencia, no solo por el creador del registro.
+- [x] Añadir pruebas Vitest para el mes explícito y para gastos registrados por Administración a nombre de un socio.

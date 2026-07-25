@@ -45,8 +45,8 @@
 :root {
   --primary: var(--color-blue-700);
   --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-600);
-  --sidebar-primary-foreground: var(--color-blue-50);
+  --sidebar-primary: oklch(0.73 0.13 75);
+  --sidebar-primary-foreground: oklch(1 0 0);
   --chart-1: var(--color-blue-300);
   --chart-2: var(--color-blue-500);
   --chart-3: var(--color-blue-600);
@@ -70,12 +70,12 @@
   --border: oklch(0.92 0.004 286.32);
   --input: oklch(0.92 0.004 286.32);
   --ring: oklch(0.623 0.214 259.815);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.235 0.015 65);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.623 0.214 259.815);
+  --sidebar: oklch(0.27 0.025 254);
+  --sidebar-foreground: oklch(0.95 0.008 75);
+  --sidebar-accent: oklch(0.34 0.025 254);
+  --sidebar-accent-foreground: oklch(0.99 0.003 75);
+  --sidebar-border: oklch(0.39 0.022 254);
+  --sidebar-ring: oklch(0.73 0.13 75);
 }
 
 .dark {
@@ -119,6 +119,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),

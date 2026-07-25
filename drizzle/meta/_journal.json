@@ -1,5 +1,27 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1784946062795,
+      "tag": "0000_third_cannonball",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1784946354014,
+      "tag": "0001_bumpy_iron_patriot",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1784946966585,
+      "tag": "0002_ancient_pepper_potts",
+      "breakpoints": true
+    }
+  ]
 }
