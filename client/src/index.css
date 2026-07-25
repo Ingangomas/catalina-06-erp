@@ -175,4 +175,20 @@
       max-width: 1280px; /* Standard content width */
     }
   }
+
+  .grid-input {
+    @apply h-9 w-full rounded-md border border-[#d9d0c3] bg-white px-2 text-sm text-[#253142] outline-none transition-colors focus:border-[#d89637] focus:ring-2 focus:ring-[#f2d7ad]/60;
+  }
+
+  .form-input {
+    @apply h-10 w-full rounded-lg border border-[#ddd5c9] bg-white px-3 text-sm text-[#253142] outline-none transition-colors focus:border-[#d89637] focus:ring-2 focus:ring-[#f2d7ad]/60;
+  }
+
+  .invoice-button {
+    @apply flex min-h-20 items-center gap-3 rounded-xl border border-dashed border-[#cfc4b3] bg-[#fcfaf6] px-4 text-left text-[#253142] transition-colors hover:border-[#d89637] hover:bg-[#fffaf0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d89637];
+  }
+
+  .invoice-button small {
+    @apply mt-1 block text-xs text-slate-500;
+  }
 }

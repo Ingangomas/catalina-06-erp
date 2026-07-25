@@ -16,7 +16,7 @@
 - [x] Diseñar una interfaz financiera clara y funcional con navegación lateral, estados vacíos y accesibilidad básica.
 - [x] Crear y ejecutar pruebas Vitest para permisos, cálculos de resumen y validaciones críticas.
 - [x] Verificar visualmente el flujo principal, revisar errores de compilación y actualizar este registro como completado.
-- [ ] Guardar un checkpoint de la primera versión completa y entregar el acceso al prototipo.
+- [x] Guardar un checkpoint de la primera versión completa y entregar el acceso al prototipo.
 - [x] Aplicar permisos por rol en la interfaz, incluyendo navegación y acciones visibles para socios, Contador y Administrador.
 - [x] Mostrar en la interfaz los nombres exactos de los roles y verificar la coherencia entre restricciones de cliente y servidor.
 - [x] Cubrir con Vitest las restricciones de roles y las agregaciones de reportes generadas por Polars.
@@ -24,3 +24,22 @@
 - [x] Mostrar y permitir seleccionar explícitamente el mes del gasto dentro del formulario de registro, con validación de cliente y servidor.
 - [x] Incorporar el socio responsable del gasto al modelo y filtrar las vistas de socios por dicha pertenencia, no solo por el creador del registro.
 - [x] Añadir pruebas Vitest para el mes explícito y para gastos registrados por Administración a nombre de un socio.
+- [x] Permitir editar gastos existentes con controles de acceso, trazabilidad de cambios y validación de estado.
+- [x] Implementar una cuadrícula financiera tipo Excel con filas editables, inserción y eliminación de filas, y ajustes controlados de color por fila o columna.
+- [x] Mostrar los nombres reales registrados de Socio 1 y Socio 2, y permitir añadir participantes adicionales para registrar gastos del proyecto.
+- [x] Permitir que el Contador cree o asigne gastos a cualquier participante autorizado.
+- [x] Optimizar el registro móvil para tomar una fotografía de la factura y conservarla vinculada al gasto correspondiente.
+- [x] Integrar extracción asistida por IA de facturas para proponer descripción, monto, fecha, categoría y mes antes de la confirmación humana.
+- [x] Confirmar la disponibilidad del modelo Gemini solicitado o una alternativa compatible y configurar de forma segura las credenciales necesarias.
+- [x] Ampliar las pruebas Vitest para edición de gastos, permisos de participantes, cuadrícula y extracción asistida de facturas.
+- [x] Validar visualmente la cuadrícula, sus colores y los accesos móviles de captura antes de guardar el checkpoint.
+- [ ] Confirmar en un teléfono físico el permiso de cámara y la fotografía real de una factura antes de su uso operativo.
+- [x] Aplicar reglas explícitas de edición por estado y registrar una auditoría verificable de cada cambio de gasto.
+- [x] Añadir pruebas de API para edición de gastos y pruebas de lógica de inserción, eliminación y coloración de la cuadrícula.
+- [ ] Validar con una sesión autenticada la experiencia de edición inline, los colores persistidos y el flujo de captura desde la interfaz real.
+- [x] Validar de forma observable el modo de edición autenticado, mostrando los campos precargados y acciones disponibles sin guardar cambios.
+- [ ] Validar de extremo a extremo la carga de una imagen de prueba, guardando un gasto autorizado y comprobando tras recarga que la evidencia quedó archivada y visible.
+- [x] Implementar la anulación segura de gastos con confirmación, permisos por rol, exclusión de totales operativos y trazabilidad de auditoría.
+- [ ] Añadir pruebas Vitest y validación visual para la anulación de un gasto sin pérdida física de sus evidencias archivadas.
+- [ ] Validar visualmente en sesión autenticada la acción Anular, incluyendo motivo, confirmación, estado resultante y desaparición del gasto de los totales y listado operativo.
+- [x] Añadir una verificación automatizada o documentada de que anular un gasto no elimina sus facturas en expense_invoices ni su referencia S3, y que la evidencia sigue recuperable para auditoría.

@@ -1,9 +1,10 @@
-import { and, asc, count, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { or } from "drizzle-orm";
 import {
   expenseApprovals,
   expenseCategories,
+  expenseChangeLogs,
+  expenseGridStyles,
   expenseInvoices,
   expenses,
   InsertUser,
@@ -13,9 +14,10 @@ import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-export type ProjectRole = "user" | "socio_1" | "socio_2" | "contador" | "admin";
-export type ExpenseType = "socio_1" | "socio_2" | "global_shared";
-export type ExpenseStatus = "draft" | "submitted" | "approved" | "rejected";
+export type ProjectRole = "user" | "socio_1" | "socio_2" | "participante" | "contador" | "admin";
+export type ExpenseType = "socio_1" | "socio_2" | "participant" | "global_shared";
+export type ExpenseStatus = "draft" | "submitted" | "approved" | "rejected" | "voided";
+export type ExpenseChangeAction = "created" | "updated" | "ai_extracted" | "submitted" | "reviewed" | "voided";
 
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
@@ -30,10 +32,7 @@ export async function getDb() {
 }
 
 export async function upsertUser(user: InsertUser): Promise<void> {
-  if (!user.openId) {
-    throw new Error("User openId is required for upsert");
-  }
-
+  if (!user.openId) throw new Error("User openId is required for upsert");
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot upsert user: database not available");
@@ -52,12 +51,10 @@ export async function upsertUser(user: InsertUser): Promise<void> {
         updateSet[field] = value ?? null;
       }
     });
-
     if (user.lastSignedIn !== undefined) {
       values.lastSignedIn = user.lastSignedIn;
       updateSet.lastSignedIn = user.lastSignedIn;
     }
-
     if (user.role !== undefined) {
       values.role = user.role;
       updateSet.role = user.role;
@@ -65,7 +62,6 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.role = "admin";
       updateSet.role = "admin";
     }
-
     if (!values.lastSignedIn) values.lastSignedIn = new Date();
     if (Object.keys(updateSet).length === 0) updateSet.lastSignedIn = new Date();
 
@@ -79,7 +75,6 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 export async function getUserByOpenId(openId: string) {
   const db = await getDb();
   if (!db) return undefined;
-
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
   return result[0];
 }
@@ -87,30 +82,34 @@ export async function getUserByOpenId(openId: string) {
 export async function listProjectUsers() {
   const db = await getDb();
   if (!db) return [];
-
   return db
     .select({
       id: users.id,
       name: users.name,
+      displayName: users.displayName,
       email: users.email,
       role: users.role,
       lastSignedIn: users.lastSignedIn,
     })
     .from(users)
-    .orderBy(asc(users.name));
+    .orderBy(asc(users.displayName), asc(users.name));
 }
 
 export async function updateProjectUserRole(userId: number, role: ProjectRole) {
   const db = await getDb();
   if (!db) throw new Error("Database unavailable");
-
   await db.update(users).set({ role }).where(eq(users.id, userId));
+}
+
+export async function updateProjectUserDisplayName(userId: number, displayName: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable");
+  await db.update(users).set({ displayName }).where(eq(users.id, userId));
 }
 
 export async function listExpenseCategories() {
   const db = await getDb();
   if (!db) return [];
-
   return db
     .select()
     .from(expenseCategories)
@@ -127,12 +126,53 @@ export type CreateExpensePayload = {
   incurredOn: Date;
   reportingMonth: string;
   expenseType: ExpenseType;
+  aiAssisted?: boolean;
 };
+
+export type UpdateExpensePayload = Omit<CreateExpensePayload, "createdByUserId" | "aiAssisted"> & {
+  changedByUserId: number;
+};
+
+export type ExpenseUpdateAuditSnapshot = {
+  description: string;
+  amount: string;
+  incurredOn: Date;
+  reportingMonth: string;
+  expenseType: ExpenseType;
+  categoryId: number;
+  chargedToUserId: number | null;
+  status: ExpenseStatus;
+};
+
+export function buildExpenseUpdateAuditDetails(previous: ExpenseUpdateAuditSnapshot, payload: UpdateExpensePayload) {
+  return JSON.stringify({
+    message: "Gasto editado; el estado volvió a borrador para una nueva revisión.",
+    previous: {
+      description: previous.description,
+      amount: previous.amount,
+      incurredOn: previous.incurredOn.toISOString().slice(0, 10),
+      reportingMonth: previous.reportingMonth,
+      expenseType: previous.expenseType,
+      categoryId: previous.categoryId,
+      chargedToUserId: previous.chargedToUserId,
+      status: previous.status,
+    },
+    next: {
+      description: payload.description,
+      amount: payload.amount,
+      incurredOn: payload.incurredOn.toISOString().slice(0, 10),
+      reportingMonth: payload.reportingMonth,
+      expenseType: payload.expenseType,
+      categoryId: payload.categoryId,
+      chargedToUserId: payload.chargedToUserId,
+      status: "draft",
+    },
+  });
+}
 
 export async function createExpenseRecord(payload: CreateExpensePayload) {
   const db = await getDb();
   if (!db) throw new Error("Database unavailable");
-
   const [created] = await db
     .insert(expenses)
     .values({
@@ -148,47 +188,150 @@ export async function createExpenseRecord(payload: CreateExpensePayload) {
     })
     .$returningId();
 
+  if (created?.id) {
+    await db.insert(expenseChangeLogs).values({
+      expenseId: created.id,
+      changedByUserId: payload.createdByUserId,
+      action: payload.aiAssisted ? "ai_extracted" : "created",
+      details: payload.aiAssisted ? "Registro creado tras revisión de datos sugeridos por IA." : "Registro de gasto creado.",
+    });
+  }
   return created?.id;
+}
+
+export async function updateExpenseRecord(expenseId: number, payload: UpdateExpensePayload) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable");
+  await db.transaction(async tx => {
+    const [previous] = await tx
+      .select({
+        description: expenses.description,
+        amount: expenses.amount,
+        incurredOn: expenses.incurredOn,
+        reportingMonth: expenses.reportingMonth,
+        expenseType: expenses.expenseType,
+        categoryId: expenses.categoryId,
+        chargedToUserId: expenses.chargedToUserId,
+        status: expenses.status,
+      })
+      .from(expenses)
+      .where(eq(expenses.id, expenseId))
+      .limit(1);
+    if (!previous) throw new Error("Expense not found");
+    await tx
+      .update(expenses)
+      .set({
+        chargedToUserId: payload.chargedToUserId,
+        categoryId: payload.categoryId,
+        description: payload.description,
+        amount: payload.amount,
+        incurredOn: payload.incurredOn,
+        reportingMonth: payload.reportingMonth,
+        expenseType: payload.expenseType,
+        status: "draft",
+        submittedAt: null,
+      })
+      .where(eq(expenses.id, expenseId));
+    await tx.delete(expenseApprovals).where(eq(expenseApprovals.expenseId, expenseId));
+    await tx.insert(expenseChangeLogs).values({
+      expenseId,
+      changedByUserId: payload.changedByUserId,
+      action: "updated",
+      details: buildExpenseUpdateAuditDetails(previous, payload),
+    });
+  });
+}
+
+export type VoidExpensePayload = {
+  expenseId: number;
+  voidedByUserId: number;
+  reason: string;
+};
+
+export function buildExpenseVoidAuditDetails(input: {
+  description: string;
+  previousStatus: ExpenseStatus;
+  reason: string;
+}) {
+  return JSON.stringify({
+    message: "Gasto anulado de forma segura; se conserva su evidencia y trazabilidad.",
+    description: input.description,
+    previousStatus: input.previousStatus,
+    nextStatus: "voided",
+    reason: input.reason,
+  });
+}
+
+export async function executeVoidExpenseTransaction(tx: any, payload: VoidExpensePayload) {
+  const [previous] = await tx
+    .select({ description: expenses.description, status: expenses.status })
+    .from(expenses)
+    .where(eq(expenses.id, payload.expenseId))
+    .limit(1);
+  if (!previous) throw new Error("Expense not found");
+  if (previous.status === "voided") throw new Error("Expense already voided");
+
+  await tx
+    .update(expenses)
+    .set({ status: "voided", submittedAt: null })
+    .where(eq(expenses.id, payload.expenseId));
+  await tx.insert(expenseChangeLogs).values({
+    expenseId: payload.expenseId,
+    changedByUserId: payload.voidedByUserId,
+    action: "voided",
+    details: buildExpenseVoidAuditDetails({
+      description: previous.description,
+      previousStatus: previous.status,
+      reason: payload.reason,
+    }),
+  });
+}
+
+export async function voidExpenseRecord(payload: VoidExpensePayload) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable");
+  await db.transaction(async tx => executeVoidExpenseTransaction(tx, payload));
 }
 
 export async function getExpenseOwnership(expenseId: number) {
   const db = await getDb();
   if (!db) return undefined;
-
   const result = await db
     .select({
       id: expenses.id,
       createdByUserId: expenses.createdByUserId,
       chargedToUserId: expenses.chargedToUserId,
       reportingMonth: expenses.reportingMonth,
+      expenseType: expenses.expenseType,
       status: expenses.status,
     })
     .from(expenses)
     .where(eq(expenses.id, expenseId))
     .limit(1);
-
   return result[0];
+}
+
+export async function logExpenseChange(input: {
+  expenseId: number;
+  changedByUserId: number;
+  action: ExpenseChangeAction;
+  details: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable");
+  await db.insert(expenseChangeLogs).values(input);
 }
 
 export async function submitExpenseRecord(expenseId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database unavailable");
-
-  await db
-    .update(expenses)
-    .set({ status: "submitted", submittedAt: new Date() })
-    .where(eq(expenses.id, expenseId));
+  await db.update(expenses).set({ status: "submitted", submittedAt: new Date() }).where(eq(expenses.id, expenseId));
 }
 
 export async function getInvoiceCountForExpense(expenseId: number) {
   const db = await getDb();
   if (!db) return 0;
-
-  const result = await db
-    .select({ count: count() })
-    .from(expenseInvoices)
-    .where(eq(expenseInvoices.expenseId, expenseId));
-
+  const result = await db.select({ count: count() }).from(expenseInvoices).where(eq(expenseInvoices.expenseId, expenseId));
   return Number(result[0]?.count ?? 0);
 }
 
@@ -206,7 +349,6 @@ export type AddInvoicePayload = {
 export async function addExpenseInvoice(payload: AddInvoicePayload) {
   const db = await getDb();
   if (!db) throw new Error("Database unavailable");
-
   const [created] = await db.insert(expenseInvoices).values(payload).$returningId();
   return created?.id;
 }
@@ -221,13 +363,8 @@ export type ReviewExpensePayload = {
 export async function reviewExpenseRecord(payload: ReviewExpensePayload) {
   const db = await getDb();
   if (!db) throw new Error("Database unavailable");
-
   await db.transaction(async tx => {
-    await tx
-      .update(expenses)
-      .set({ status: payload.decision })
-      .where(eq(expenses.id, payload.expenseId));
-
+    await tx.update(expenses).set({ status: payload.decision }).where(eq(expenses.id, payload.expenseId));
     await tx.insert(expenseApprovals).values(payload).onDuplicateKeyUpdate({
       set: {
         reviewedByUserId: payload.reviewedByUserId,
@@ -235,6 +372,12 @@ export async function reviewExpenseRecord(payload: ReviewExpensePayload) {
         comments: payload.comments ?? null,
         reviewedAt: new Date(),
       },
+    });
+    await tx.insert(expenseChangeLogs).values({
+      expenseId: payload.expenseId,
+      changedByUserId: payload.reviewedByUserId,
+      action: "reviewed",
+      details: payload.decision === "approved" ? "Gasto aprobado." : "Gasto rechazado.",
     });
   });
 }
@@ -248,79 +391,95 @@ export type ExpenseListFilters = {
 export async function listExpenseRecords(filters: ExpenseListFilters = {}) {
   const db = await getDb();
   if (!db) return [];
-
   const conditions = [];
   if (filters.month) conditions.push(eq(expenses.reportingMonth, filters.month));
   if (filters.chargedToUserId) {
     conditions.push(
       filters.includeGlobalShared
-        ? or(
-            eq(expenses.chargedToUserId, filters.chargedToUserId),
-            eq(expenses.expenseType, "global_shared"),
-          )
+        ? or(eq(expenses.chargedToUserId, filters.chargedToUserId), eq(expenses.expenseType, "global_shared"))
         : eq(expenses.chargedToUserId, filters.chargedToUserId),
     );
   }
 
-  const rows = await db
+  const rows = (await db
     .select()
     .from(expenses)
     .innerJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
     .innerJoin(users, eq(expenses.createdByUserId, users.id))
     .leftJoin(expenseApprovals, eq(expenseApprovals.expenseId, expenses.id))
     .where(conditions.length ? and(...conditions) : undefined)
-    .orderBy(desc(expenses.incurredOn), desc(expenses.id));
+    .orderBy(desc(expenses.incurredOn), desc(expenses.id)))
+    .filter(row => row.expenses.status !== "voided");
 
-  const expenseIds = rows.map(row => row.expenses.id);
-  const invoiceRows = expenseIds.length
-    ? await db
-        .select()
-        .from(expenseInvoices)
-        .where(inArray(expenseInvoices.expenseId, expenseIds))
-        .orderBy(desc(expenseInvoices.uploadedAt))
-    : [];
-
+  const [invoiceRows, memberRows] = await Promise.all([
+    rows.length
+      ? db.select().from(expenseInvoices).where(inArray(expenseInvoices.expenseId, rows.map(row => row.expenses.id))).orderBy(desc(expenseInvoices.uploadedAt))
+      : Promise.resolve([]),
+    db.select({ id: users.id, name: users.name, displayName: users.displayName, email: users.email, role: users.role }).from(users),
+  ]);
   const invoicesByExpense = new Map<number, typeof invoiceRows>();
   invoiceRows.forEach(invoice => {
-    const invoices = invoicesByExpense.get(invoice.expenseId) ?? [];
-    invoices.push(invoice);
-    invoicesByExpense.set(invoice.expenseId, invoices);
+    const invoiceList = invoicesByExpense.get(invoice.expenseId) ?? [];
+    invoiceList.push(invoice);
+    invoicesByExpense.set(invoice.expenseId, invoiceList);
   });
+  const membersById = new Map(memberRows.map(member => [member.id, member]));
 
-  return rows.map(row => ({
-    id: row.expenses.id,
-    description: row.expenses.description,
-    amount: Number(row.expenses.amount),
-    currency: row.expenses.currency,
-    incurredOn: row.expenses.incurredOn,
-    reportingMonth: row.expenses.reportingMonth,
-    expenseType: row.expenses.expenseType,
-    status: row.expenses.status,
-    submittedAt: row.expenses.submittedAt,
-    createdAt: row.expenses.createdAt,
-    updatedAt: row.expenses.updatedAt,
-    createdByUserId: row.expenses.createdByUserId,
-    chargedToUserId: row.expenses.chargedToUserId,
-    category: {
-      id: row.expense_categories.id,
-      label: row.expense_categories.label,
-      color: row.expense_categories.color,
-    },
-    createdBy: {
-      id: row.users.id,
-      name: row.users.name,
-      email: row.users.email,
-      role: row.users.role,
-    },
-    approval: row.expense_approvals
-      ? {
-          id: row.expense_approvals.id,
-          decision: row.expense_approvals.decision,
-          comments: row.expense_approvals.comments,
-          reviewedAt: row.expense_approvals.reviewedAt,
-          reviewedByUserId: row.expense_approvals.reviewedByUserId,
-        }
-      : null,
-    invoices: invoicesByExpense.get(row.expenses.id) ?? [],
-  }));
+  return rows.map(row => {
+    const chargedTo = row.expenses.chargedToUserId ? membersById.get(row.expenses.chargedToUserId) ?? null : null;
+    return {
+      id: row.expenses.id,
+      description: row.expenses.description,
+      amount: Number(row.expenses.amount),
+      currency: row.expenses.currency,
+      incurredOn: row.expenses.incurredOn,
+      reportingMonth: row.expenses.reportingMonth,
+      expenseType: row.expenses.expenseType,
+      status: row.expenses.status,
+      submittedAt: row.expenses.submittedAt,
+      createdAt: row.expenses.createdAt,
+      updatedAt: row.expenses.updatedAt,
+      createdByUserId: row.expenses.createdByUserId,
+      chargedToUserId: row.expenses.chargedToUserId,
+      category: { id: row.expense_categories.id, label: row.expense_categories.label, color: row.expense_categories.color },
+      createdBy: {
+        id: row.users.id,
+        name: row.users.displayName || row.users.name,
+        email: row.users.email,
+        role: row.users.role,
+      },
+      chargedTo: chargedTo
+        ? { id: chargedTo.id, name: chargedTo.displayName || chargedTo.name, email: chargedTo.email, role: chargedTo.role }
+        : null,
+      approval: row.expense_approvals
+        ? {
+            id: row.expense_approvals.id,
+            decision: row.expense_approvals.decision,
+            comments: row.expense_approvals.comments,
+            reviewedAt: row.expense_approvals.reviewedAt,
+            reviewedByUserId: row.expense_approvals.reviewedByUserId,
+          }
+        : null,
+      invoices: invoicesByExpense.get(row.expenses.id) ?? [],
+    };
+  });
+}
+
+export async function listExpenseGridStyles(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(expenseGridStyles).where(eq(expenseGridStyles.userId, userId));
+}
+
+export async function upsertExpenseGridStyle(input: {
+  userId: number;
+  targetType: "row" | "column";
+  targetKey: string;
+  backgroundColor: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable");
+  await db.insert(expenseGridStyles).values(input).onDuplicateKeyUpdate({
+    set: { backgroundColor: input.backgroundColor },
+  });
 }

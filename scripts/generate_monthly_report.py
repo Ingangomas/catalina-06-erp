@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Genera analíticas y exportaciones mensuales con Polars desde JSON por stdin."""
 
 import csv
@@ -10,7 +9,17 @@ from typing import Any
 import polars as pl
 
 CATEGORY_ORDER = ["Materiales", "Mano de Obra", "Transporte", "Botes", "Otros"]
-TYPE_ORDER = ["socio_1", "socio_2", "global_shared"]
+TYPE_ORDER = ["socio_1", "socio_2", "participant", "global_shared"]
+
+
+def expense_type_label(value: str) -> str:
+    labels = {
+        "socio_1": "Socio 1",
+        "socio_2": "Socio 2",
+        "participant": "Participante",
+        "global_shared": "Global/Compartido",
+    }
+    return labels.get(value, value)
 
 
 def empty_frame() -> pl.DataFrame:
@@ -113,13 +122,7 @@ def monthly_report(frame: pl.DataFrame, selected_month: str) -> dict[str, Any]:
     monthly = frame.filter(pl.col("reportingMonth") == selected_month)
     type_totals = totals_by_type(monthly)
     category_totals = totals_by_category(monthly)
-    summary_rows = [
-        [
-            "Socio 1" if item["expenseType"] == "socio_1" else "Socio 2" if item["expenseType"] == "socio_2" else "Global/Compartido",
-            f"{item['total']:.2f}",
-        ]
-        for item in type_totals
-    ]
+    summary_rows = [[expense_type_label(item["expenseType"]), f"{item['total']:.2f}"] for item in type_totals]
     summary_rows.append(["Total general", f"{sum(item['total'] for item in type_totals):.2f}"])
     category_rows = [[item["category"], f"{item['total']:.2f}"] for item in category_totals]
     detail_rows = (
@@ -132,7 +135,7 @@ def monthly_report(frame: pl.DataFrame, selected_month: str) -> dict[str, Any]:
             item["incurredOn"],
             item["description"],
             item["category"],
-            "Socio 1" if item["expenseType"] == "socio_1" else "Socio 2" if item["expenseType"] == "socio_2" else "Global/Compartido",
+            expense_type_label(item["expenseType"]),
             item["createdBy"],
             item["status"],
             f"{float(item['amount']):.2f}",
@@ -154,10 +157,7 @@ def main() -> None:
     payload = json.load(sys.stdin)
     frame = normalize_records(payload.get("expenses", []))
     selected_month = payload.get("selectedMonth", "")
-    if payload.get("mode") == "monthly_report":
-        result = monthly_report(frame, selected_month)
-    else:
-        result = analytics(frame, selected_month)
+    result = monthly_report(frame, selected_month) if payload.get("mode") == "monthly_report" else analytics(frame, selected_month)
     print(json.dumps(result, ensure_ascii=False))
 
 

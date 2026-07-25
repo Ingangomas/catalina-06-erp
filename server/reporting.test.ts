@@ -56,6 +56,7 @@ describe("generación de reportes con Polars", () => {
     expect(result.typeTotals).toEqual([
       { expenseType: "socio_1", total: 0 },
       { expenseType: "socio_2", total: 800 },
+      { expenseType: "participant", total: 0 },
       { expenseType: "global_shared", total: 400 },
     ]);
     expect(result.categoryTotals).toContainEqual({ category: "Transporte", total: 800 });

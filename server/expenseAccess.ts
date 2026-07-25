@@ -13,6 +13,22 @@ export function canAccessExpense(
   return role === "admin" || role === "contador" || userId === expense.createdByUserId || userId === expense.chargedToUserId;
 }
 
+export function canEditExpenseStatus(role: string, status: string) {
+  if (role === "admin" || role === "contador") return true;
+  return status === "draft" || status === "submitted" || status === "rejected";
+}
+
+export function canVoidExpense(
+  role: string,
+  userId: number,
+  expense: ExpenseAccessRecord & { status: string },
+) {
+  if (expense.status === "voided") return false;
+  if (role === "admin" || role === "contador") return true;
+  const isRelatedToExpense = userId === expense.createdByUserId || userId === expense.chargedToUserId;
+  return isRelatedToExpense && (expense.status === "draft" || expense.status === "submitted" || expense.status === "rejected");
+}
+
 export function accessibleExpenseFilters(
   role: string,
   userId: number,

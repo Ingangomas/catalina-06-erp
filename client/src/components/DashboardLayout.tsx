@@ -32,9 +32,9 @@ import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 type ProjectRole = keyof typeof USER_ROLE_LABELS;
 
 const navItems = [
-  { label: "Resumen", path: "/", icon: LayoutDashboard, roles: ["socio_1", "socio_2", "contador", "admin"] },
-  { label: "Gastos", path: "/gastos", icon: ReceiptText, roles: ["socio_1", "socio_2", "contador", "admin"] },
-  { label: "Reportes", path: "/reportes", icon: FileSpreadsheet, roles: ["socio_1", "socio_2", "contador", "admin"] },
+  { label: "Resumen", path: "/", icon: LayoutDashboard, roles: ["socio_1", "socio_2", "participante", "contador", "admin"] },
+  { label: "Gastos", path: "/gastos", icon: ReceiptText, roles: ["socio_1", "socio_2", "participante", "contador", "admin"] },
+  { label: "Reportes", path: "/reportes", icon: FileSpreadsheet, roles: ["socio_1", "socio_2", "participante", "contador", "admin"] },
   { label: "Equipo y roles", path: "/equipo", icon: ShieldCheck, roles: ["contador", "admin"] },
 ] as const;
 

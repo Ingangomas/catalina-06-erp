@@ -1,6 +1,7 @@
 export const USER_ROLE_LABELS = {
   socio_1: "Socio 1 (Ing. Angomas)",
   socio_2: "Socio 2 (Ing. Johan)",
+  participante: "Participante",
   contador: "Contador",
   admin: "Administrador",
   user: "Usuario sin asignar",
@@ -9,6 +10,7 @@ export const USER_ROLE_LABELS = {
 export const EXPENSE_TYPE_LABELS = {
   socio_1: "Socio 1",
   socio_2: "Socio 2",
+  participant: "Participante",
   global_shared: "Global/Compartido",
 } as const;
 
@@ -17,6 +19,7 @@ export const EXPENSE_STATUS_LABELS = {
   submitted: "Enviado",
   approved: "Aprobado",
   rejected: "Rechazado",
+  voided: "Anulado",
 } as const;
 
 export const EXPENSE_CATEGORY_DEFINITIONS = [

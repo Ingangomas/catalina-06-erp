@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
-import { accessibleExpenseFilters, canAccessExpense } from "./expenseAccess";
+import { accessibleExpenseFilters, canAccessExpense, canEditExpenseStatus, canVoidExpense } from "./expenseAccess";
 import { reportingMonthSchema } from "../shared/expenseSchemas";
 
 function createPartnerContext(): TrpcContext {
@@ -65,5 +65,37 @@ describe("restricciones de acceso a gastos", () => {
     expect(reportingMonthSchema.safeParse("2026-07").success).toBe(true);
     expect(reportingMonthSchema.safeParse("2026-13").success).toBe(false);
     expect(reportingMonthSchema.safeParse("julio-2026").success).toBe(false);
+  });
+
+  it("restringe la edición de un participante a sus propios gastos y permite la gestión contable", () => {
+    const filters = accessibleExpenseFilters("participante", 24, "2026-07");
+    expect(filters).toEqual({
+      month: "2026-07",
+      chargedToUserId: 24,
+      includeGlobalShared: true,
+    });
+    expect(canAccessExpense("participante", 24, { createdByUserId: 3, chargedToUserId: 24 })).toBe(true);
+    expect(canAccessExpense("participante", 24, { createdByUserId: 3, chargedToUserId: 8 })).toBe(false);
+    expect(canAccessExpense("contador", 99, { createdByUserId: 3, chargedToUserId: 8 })).toBe(true);
+  });
+
+  it("protege los gastos aprobados de ediciones no contables", () => {
+    expect(canEditExpenseStatus("socio_1", "approved")).toBe(false);
+    expect(canEditExpenseStatus("socio_1", "submitted")).toBe(true);
+    expect(canEditExpenseStatus("participante", "rejected")).toBe(true);
+    expect(canEditExpenseStatus("contador", "approved")).toBe(true);
+    expect(canEditExpenseStatus("admin", "approved")).toBe(true);
+  });
+
+  it("permite anular según el rol, relación con el gasto y estado", () => {
+    const ownDraft = { createdByUserId: 12, chargedToUserId: 12, status: "draft" };
+    const ownApproved = { createdByUserId: 12, chargedToUserId: 12, status: "approved" };
+    const foreignDraft = { createdByUserId: 3, chargedToUserId: 8, status: "draft" };
+
+    expect(canVoidExpense("socio_1", 12, ownDraft)).toBe(true);
+    expect(canVoidExpense("socio_1", 12, ownApproved)).toBe(false);
+    expect(canVoidExpense("socio_1", 12, foreignDraft)).toBe(false);
+    expect(canVoidExpense("contador", 90, ownApproved)).toBe(true);
+    expect(canVoidExpense("admin", 1, { ...ownDraft, status: "voided" })).toBe(false);
   });
 });
