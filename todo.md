@@ -36,13 +36,17 @@
 - [ ] Confirmar en un teléfono físico el permiso de cámara y la fotografía real de una factura antes de su uso operativo.
 - [x] Aplicar reglas explícitas de edición por estado y registrar una auditoría verificable de cada cambio de gasto.
 - [x] Añadir pruebas de API para edición de gastos y pruebas de lógica de inserción, eliminación y coloración de la cuadrícula.
-- [ ] Validar con una sesión autenticada la experiencia de edición inline, los colores persistidos y el flujo de captura desde la interfaz real.
+- [x] Validar con una sesión autenticada la experiencia de edición inline, los colores persistidos y el flujo de captura desde la interfaz real.
 - [x] Validar de forma observable el modo de edición autenticado, mostrando los campos precargados y acciones disponibles sin guardar cambios.
-- [ ] Validar de extremo a extremo la carga de una imagen de prueba, guardando un gasto autorizado y comprobando tras recarga que la evidencia quedó archivada y visible.
+- [x] Validar de extremo a extremo la carga de una imagen de prueba, guardando un gasto autorizado y comprobando tras recarga que la evidencia quedó archivada y visible.
 - [x] Implementar la anulación segura de gastos con confirmación, permisos por rol, exclusión de totales operativos y trazabilidad de auditoría.
-- [ ] Añadir pruebas Vitest y validación visual para la anulación de un gasto sin pérdida física de sus evidencias archivadas.
-- [ ] Validar visualmente en sesión autenticada la acción Anular, incluyendo motivo, confirmación, estado resultante y desaparición del gasto de los totales y listado operativo.
+- [x] Añadir pruebas Vitest y validación visual para la anulación de un gasto sin pérdida física de sus evidencias archivadas.
+- [x] Validar visualmente en sesión autenticada la acción Anular, incluyendo motivo, confirmación, estado resultante y desaparición del gasto de los totales y listado operativo.
 - [x] Añadir una verificación automatizada o documentada de que anular un gasto no elimina sus facturas en expense_invoices ni su referencia S3, y que la evidencia sigue recuperable para auditoría.
 - [x] Exponer para Contador y Administrador una vista de auditoría de gastos anulados con su motivo y evidencias conservadas.
 - [x] Mostrar un estado de error recuperable cuando falle la carga de la auditoría de anulaciones.
 - [x] Ejecutar y documentar la compilación de producción posterior a la ruta y vista de auditoría.
+- [x] Crear un gasto de prueba autorizado con una evidencia de archivo controlada para validar el flujo operativo completo.
+- [x] Anular el gasto de prueba autorizado con motivo y confirmar su exclusión de los totales operativos.
+- [x] Verificar desde Auditoría que la evidencia del gasto anulado sigue disponible y documentar el resultado de la prueba controlada.
+- [x] Reemplazar los avisos nativos de anulación por un diálogo accesible con motivo obligatorio y confirmación explícita.

@@ -46,3 +46,11 @@ La carga real de `PRUEBA1.jpeg` se completó dentro del formulario autenticado s
 - El procedimiento `expenses.listVoided` aplica la misma restricción en el servidor; `voidAuditAccess.test.ts` verifica que un socio recibe acceso denegado y que el Contador obtiene únicamente los registros del mes solicitado.
 - La pantalla muestra estados de carga, estado vacío y un mensaje recuperable con el botón **Reintentar** si la consulta de auditoría falla. La vista se revisó en escritorio y móvil sin crear ni modificar registros productivos.
 - La comprobación final `pnpm check && pnpm test && pnpm build` terminó correctamente: 21 pruebas en 8 archivos y empaquetado de producción exitoso. El empaquetador mantiene una advertencia no bloqueante sobre el tamaño del bundle principal, que podrá optimizarse con división de código en una mejora posterior.
+
+## Prueba operativa autorizada de anulación — 25 de julio de 2026
+
+- Con autorización explícita se creó el gasto controlado **“PRUEBA CONTROLADA — conservar evidencia tras anulación”**, por **RD$1.00**, con fecha y período `2026-07`, categoría **Materiales**, tipo **Global/Compartido** y la evidencia `PRUEBA1.jpeg` cargada mediante el formulario autenticado. La evidencia fue archivada y el gasto quedó enviado para revisión.
+- Se detectó que los avisos nativos del navegador impedían una confirmación fiable en la interfaz. Se sustituyeron por un diálogo accesible propio, con explicación de las consecuencias, campo de motivo obligatorio y acción explícita **Confirmar anulación**. TypeScript, las 21 pruebas Vitest y la compilación de producción terminaron correctamente después del cambio.
+- La anulación se confirmó con el motivo **“Prueba autorizada de preservación de evidencia y trazabilidad.”**. La cuadrícula operativa pasó de dos a un registro y el gasto de prueba dejó de aparecer en `/gastos`.
+- El resumen mensual permaneció en **RD$10,000.00** y un registro operativo, por lo que el gasto de prueba de RD$1.00 no afectó los totales ni las métricas activas.
+- En `/auditoria` se verificó un registro anulado, una evidencia preservada, el motivo, el estado previo `submitted`, la persona que anuló y la fecha. El enlace `PRUEBA1.jpeg` abrió correctamente el archivo archivado, lo que confirma su accesibilidad posterior a la anulación.
