@@ -43,3 +43,6 @@
 - [ ] Añadir pruebas Vitest y validación visual para la anulación de un gasto sin pérdida física de sus evidencias archivadas.
 - [ ] Validar visualmente en sesión autenticada la acción Anular, incluyendo motivo, confirmación, estado resultante y desaparición del gasto de los totales y listado operativo.
 - [x] Añadir una verificación automatizada o documentada de que anular un gasto no elimina sus facturas en expense_invoices ni su referencia S3, y que la evidencia sigue recuperable para auditoría.
+- [x] Exponer para Contador y Administrador una vista de auditoría de gastos anulados con su motivo y evidencias conservadas.
+- [x] Mostrar un estado de error recuperable cuando falle la carga de la auditoría de anulaciones.
+- [x] Ejecutar y documentar la compilación de producción posterior a la ruta y vista de auditoría.

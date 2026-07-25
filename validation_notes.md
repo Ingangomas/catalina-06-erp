@@ -36,6 +36,13 @@ La carga real de `PRUEBA1.jpeg` se completó dentro del formulario autenticado s
 - La ruta autenticada `/gastos` mostró la acción visible **Anular** junto a **Editar** para un gasto en borrador; la acción queda disponible de acuerdo con el rol y el estado del registro.
 - La revisión de `voidExpenseRecord()` confirmó que la transacción solamente consulta el gasto, actualiza su estado a `voided` y agrega una entrada `voided` a `expense_change_logs`. No ejecuta borrados sobre `expense_invoices` ni opera sobre el almacenamiento S3.
 - La relación con las evidencias se conserva: `expense_invoices` mantiene la clave de almacenamiento y la URL de cada archivo, mientras que `listExpenseRecords()` excluye el gasto anulado del listado operativo después de obtener sus filas. Por tanto, la anulación elimina el gasto de los totales operativos sin eliminar la evidencia vinculada.
-- Se reinició el servicio para limpiar el módulo en memoria. La comprobación de TypeScript, las 19 pruebas Vitest y la compilación de producción finalizaron correctamente.
+- Se reinició el servicio para limpiar el módulo en memoria. La comprobación de TypeScript, las 21 pruebas Vitest y la compilación de producción finalizaron correctamente.
 - La prueba automatizada `expenseVoidPersistence.test.ts` ejecutó la transacción de anulación con una factura hipotéticamente ya archivada y confirmó que la operación solamente actualiza el gasto e inserta la auditoría; no invoca ninguna eliminación de la relación de facturas.
 - No se ejecutó el clic final de anulación sobre el gasto real de la sesión autenticada, ya que ello modificaría datos operativos. Queda pendiente una prueba controlada con un registro autorizado para validar visualmente el motivo, la confirmación y el resultado posterior a la anulación.
+
+## Auditoría de anulaciones — 25 de julio de 2026
+
+- Se añadió la ruta autenticada `/auditoria`, visible exclusivamente para **Contador** y **Administrador**. Expone el gasto anulado, motivo, estado previo, usuario y fecha de anulación, además de los enlaces de las evidencias preservadas.
+- El procedimiento `expenses.listVoided` aplica la misma restricción en el servidor; `voidAuditAccess.test.ts` verifica que un socio recibe acceso denegado y que el Contador obtiene únicamente los registros del mes solicitado.
+- La pantalla muestra estados de carga, estado vacío y un mensaje recuperable con el botón **Reintentar** si la consulta de auditoría falla. La vista se revisó en escritorio y móvil sin crear ni modificar registros productivos.
+- La comprobación final `pnpm check && pnpm test && pnpm build` terminó correctamente: 21 pruebas en 8 archivos y empaquetado de producción exitoso. El empaquetador mantiene una advertencia no bloqueante sobre el tamaño del bundle principal, que podrá optimizarse con división de código en una mejora posterior.

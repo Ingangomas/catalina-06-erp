@@ -3,6 +3,7 @@ import { startLogin } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { USER_ROLE_LABELS } from "@shared/expenseConstants";
 import {
+  Archive,
   BarChart3,
   FileSpreadsheet,
   HardHat,
@@ -35,6 +36,7 @@ const navItems = [
   { label: "Resumen", path: "/", icon: LayoutDashboard, roles: ["socio_1", "socio_2", "participante", "contador", "admin"] },
   { label: "Gastos", path: "/gastos", icon: ReceiptText, roles: ["socio_1", "socio_2", "participante", "contador", "admin"] },
   { label: "Reportes", path: "/reportes", icon: FileSpreadsheet, roles: ["socio_1", "socio_2", "participante", "contador", "admin"] },
+  { label: "Auditoría", path: "/auditoria", icon: Archive, roles: ["contador", "admin"] },
   { label: "Equipo y roles", path: "/equipo", icon: ShieldCheck, roles: ["contador", "admin"] },
 ] as const;
 

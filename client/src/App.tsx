@@ -6,6 +6,7 @@ import ExpensesPage from "@/pages/ExpensesPage";
 import NotFound from "@/pages/NotFound";
 import ReportsPage from "@/pages/ReportsPage";
 import TeamPage from "@/pages/TeamPage";
+import VoidedExpensesPage from "@/pages/VoidedExpensesPage";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -18,6 +19,7 @@ function Router() {
         <Route path={"/"} component={DashboardPage} />
         <Route path={"/gastos"} component={ExpensesPage} />
         <Route path={"/reportes"} component={ReportsPage} />
+        <Route path={"/auditoria"} component={VoidedExpensesPage} />
         <Route path={"/equipo"} component={TeamPage} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />

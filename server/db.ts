@@ -465,6 +465,83 @@ export async function listExpenseRecords(filters: ExpenseListFilters = {}) {
   });
 }
 
+function parseVoidAuditDetails(details: string | null) {
+  try {
+    const parsed = JSON.parse(details ?? "{}") as { reason?: unknown; previousStatus?: unknown };
+    return {
+      reason: typeof parsed.reason === "string" && parsed.reason.trim() ? parsed.reason : "Motivo no registrado",
+      previousStatus: typeof parsed.previousStatus === "string" ? parsed.previousStatus : "Sin estado registrado",
+    };
+  } catch {
+    return { reason: "Motivo no registrado", previousStatus: "Sin estado registrado" };
+  }
+}
+
+export async function listVoidedExpenseRecords(month?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const conditions = [eq(expenses.status, "voided")];
+  if (month) conditions.push(eq(expenses.reportingMonth, month));
+
+  const rows = await db
+    .select()
+    .from(expenses)
+    .innerJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
+    .innerJoin(users, eq(expenses.createdByUserId, users.id))
+    .where(and(...conditions))
+    .orderBy(desc(expenses.updatedAt), desc(expenses.id));
+  const expenseIds = rows.map(row => row.expenses.id);
+  const [invoiceRows, voidLogRows, memberRows] = await Promise.all([
+    expenseIds.length
+      ? db.select().from(expenseInvoices).where(inArray(expenseInvoices.expenseId, expenseIds)).orderBy(desc(expenseInvoices.uploadedAt))
+      : Promise.resolve([]),
+    expenseIds.length
+      ? db
+          .select({
+            expenseId: expenseChangeLogs.expenseId,
+            changedByUserId: expenseChangeLogs.changedByUserId,
+            details: expenseChangeLogs.details,
+            createdAt: expenseChangeLogs.createdAt,
+          })
+          .from(expenseChangeLogs)
+          .where(and(inArray(expenseChangeLogs.expenseId, expenseIds), eq(expenseChangeLogs.action, "voided")))
+          .orderBy(desc(expenseChangeLogs.createdAt))
+      : Promise.resolve([]),
+    db.select({ id: users.id, name: users.name, displayName: users.displayName, email: users.email }).from(users),
+  ]);
+  const invoicesByExpense = new Map<number, typeof invoiceRows>();
+  invoiceRows.forEach(invoice => {
+    const invoiceList = invoicesByExpense.get(invoice.expenseId) ?? [];
+    invoiceList.push(invoice);
+    invoicesByExpense.set(invoice.expenseId, invoiceList);
+  });
+  const voidLogByExpense = new Map<number, (typeof voidLogRows)[number]>();
+  voidLogRows.forEach(log => {
+    if (!voidLogByExpense.has(log.expenseId)) voidLogByExpense.set(log.expenseId, log);
+  });
+  const membersById = new Map(memberRows.map(member => [member.id, member]));
+
+  return rows.map(row => {
+    const voidLog = voidLogByExpense.get(row.expenses.id);
+    const audit = parseVoidAuditDetails(voidLog?.details ?? null);
+    const voidedBy = voidLog ? membersById.get(voidLog.changedByUserId) ?? null : null;
+    return {
+      id: row.expenses.id,
+      description: row.expenses.description,
+      amount: Number(row.expenses.amount),
+      incurredOn: row.expenses.incurredOn,
+      reportingMonth: row.expenses.reportingMonth,
+      category: { id: row.expense_categories.id, label: row.expense_categories.label, color: row.expense_categories.color },
+      createdBy: { id: row.users.id, name: row.users.displayName || row.users.name, email: row.users.email },
+      previousStatus: audit.previousStatus,
+      voidReason: audit.reason,
+      voidedAt: voidLog?.createdAt ?? row.expenses.updatedAt,
+      voidedBy: voidedBy ? { id: voidedBy.id, name: voidedBy.displayName || voidedBy.name, email: voidedBy.email } : null,
+      invoices: invoicesByExpense.get(row.expenses.id) ?? [],
+    };
+  });
+}
+
 export async function listExpenseGridStyles(userId: number) {
   const db = await getDb();
   if (!db) return [];

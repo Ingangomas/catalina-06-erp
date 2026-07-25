@@ -9,6 +9,7 @@ import {
   listExpenseCategories,
   listExpenseGridStyles,
   listExpenseRecords,
+  listVoidedExpenseRecords,
   listProjectUsers,
   logExpenseChange,
   ProjectRole,
@@ -217,6 +218,13 @@ export const appRouter = router({
       .query(async ({ ctx, input }) => {
         requireAssignedProjectRole(ctx.user.role);
         return listExpenseRecords(accessibleExpenseFilters(ctx.user.role, ctx.user.id, input?.month));
+      }),
+
+    listVoided: protectedProcedure
+      .input(z.object({ month: reportingMonthSchema.optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        requirePrivilegedRole(ctx.user.role);
+        return listVoidedExpenseRecords(input?.month);
       }),
 
     create: protectedProcedure
