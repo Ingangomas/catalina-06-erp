@@ -50,3 +50,9 @@
 - [x] Anular el gasto de prueba autorizado con motivo y confirmar su exclusión de los totales operativos.
 - [x] Verificar desde Auditoría que la evidencia del gasto anulado sigue disponible y documentar el resultado de la prueba controlada.
 - [x] Reemplazar los avisos nativos de anulación por un diálogo accesible con motivo obligatorio y confirmación explícita.
+- [x] Definir un sistema visual corporativo, luminoso y minimalista con tipografía contemporánea inspirada en Plaud.
+- [x] Establecer tokens globales de color, espaciado, bordes, elevación y transparencia para superficies claras y cristalizadas.
+- [x] Rediseñar la navegación, cabeceras, tarjetas, formularios, tablas y botones con jerarquía visual sobria y controles glassmorphism tipo pastilla.
+- [x] Verificar la consistencia visual y la respuesta móvil del nuevo sistema sin alterar los flujos de gastos, auditoría ni permisos.
+- [x] Verificar y dejar evidenciado en código el sistema tipográfico global para la identidad visual inspirada en Plaud.
+- [x] Exponer y validar los tokens y clases globales de superficies cristalizadas, bordes, elevación, espaciado y jerarquía tipográfica.
