@@ -8,13 +8,16 @@ import {
   expenseInvoices,
   expenses,
   InsertUser,
+  projectIdentityProfiles,
   users,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
+import { normalizeAuthorizedEmail } from "./identityProfiles";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
 export type ProjectRole = "user" | "socio_1" | "socio_2" | "participante" | "contador" | "admin";
+export type ExpenseOwnerType = "socio_1" | "socio_2" | "participante";
 export type ExpenseType = "socio_1" | "socio_2" | "participant" | "global_shared";
 export type ExpenseStatus = "draft" | "submitted" | "approved" | "rejected" | "voided";
 export type ExpenseChangeAction = "created" | "updated" | "ai_extracted" | "submitted" | "reviewed" | "voided";
@@ -40,6 +43,10 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   }
 
   try {
+    const normalizedEmail = user.email ? normalizeAuthorizedEmail(user.email) : null;
+    const profile = normalizedEmail
+      ? (await db.select().from(projectIdentityProfiles).where(eq(projectIdentityProfiles.email, normalizedEmail)).limit(1))[0]
+      : undefined;
     const values: InsertUser = { openId: user.openId };
     const updateSet: Record<string, unknown> = {};
     const textFields = ["name", "email", "loginMethod"] as const;
@@ -51,6 +58,18 @@ export async function upsertUser(user: InsertUser): Promise<void> {
         updateSet[field] = value ?? null;
       }
     });
+    if (normalizedEmail) {
+      values.email = normalizedEmail;
+      updateSet.email = normalizedEmail;
+    }
+    if (profile) {
+      values.displayName = profile.displayName;
+      updateSet.displayName = profile.displayName;
+      values.role = profile.role;
+      updateSet.role = profile.role;
+      values.expenseOwnerType = profile.expenseOwnerType;
+      updateSet.expenseOwnerType = profile.expenseOwnerType;
+    }
     if (user.lastSignedIn !== undefined) {
       values.lastSignedIn = user.lastSignedIn;
       updateSet.lastSignedIn = user.lastSignedIn;
@@ -58,12 +77,20 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     if (user.role !== undefined) {
       values.role = user.role;
       updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
+    } else if (!profile && user.openId === ENV.ownerOpenId) {
       values.role = "admin";
       updateSet.role = "admin";
     }
     if (!values.lastSignedIn) values.lastSignedIn = new Date();
     if (Object.keys(updateSet).length === 0) updateSet.lastSignedIn = new Date();
+
+    const matchingPreassignedUser = profile && normalizedEmail
+      ? (await db.select({ id: users.id, openId: users.openId }).from(users).where(eq(users.email, normalizedEmail)).limit(1))[0]
+      : undefined;
+    if (matchingPreassignedUser && matchingPreassignedUser.openId !== user.openId) {
+      await db.update(users).set(values).where(eq(users.id, matchingPreassignedUser.id));
+      return;
+    }
 
     await db.insert(users).values(values).onDuplicateKeyUpdate({ set: updateSet });
   } catch (error) {
@@ -88,7 +115,9 @@ export async function listProjectUsers() {
       name: users.name,
       displayName: users.displayName,
       email: users.email,
+      loginMethod: users.loginMethod,
       role: users.role,
+      expenseOwnerType: users.expenseOwnerType,
       lastSignedIn: users.lastSignedIn,
     })
     .from(users)
@@ -415,7 +444,7 @@ export async function listExpenseRecords(filters: ExpenseListFilters = {}) {
     rows.length
       ? db.select().from(expenseInvoices).where(inArray(expenseInvoices.expenseId, rows.map(row => row.expenses.id))).orderBy(desc(expenseInvoices.uploadedAt))
       : Promise.resolve([]),
-    db.select({ id: users.id, name: users.name, displayName: users.displayName, email: users.email, role: users.role }).from(users),
+    db.select({ id: users.id, name: users.name, displayName: users.displayName, email: users.email, role: users.role, expenseOwnerType: users.expenseOwnerType }).from(users),
   ]);
   const invoicesByExpense = new Map<number, typeof invoiceRows>();
   invoiceRows.forEach(invoice => {

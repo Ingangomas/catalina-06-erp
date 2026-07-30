@@ -72,7 +72,14 @@ type ExpenseRow = {
   approval: { comments: string | null } | null;
 };
 type Category = { id: number; label: string; color: string };
-type ProjectMember = { id: number; name: string | null; displayName: string | null; email: string | null; role: ProjectRole };
+type ProjectMember = {
+  id: number;
+  name: string | null;
+  displayName: string | null;
+  email: string | null;
+  role: ProjectRole;
+  expenseOwnerType: "socio_1" | "socio_2" | "participante" | null;
+};
 
 function toIsoDate(value: Date | string) {
   return new Date(value).toISOString().slice(0, 10);
@@ -286,7 +293,7 @@ function QuickGridRow({ row, categories, members, userRole, isPrivileged, isSavi
 }
 
 function EditableCells({ values, categories, members, userRole, isPrivileged, onChange }: { values: FormValues; categories: Category[]; members: ProjectMember[]; userRole?: string; isPrivileged: boolean; onChange: (patch: Partial<FormValues>) => void }) {
-  const responsibleMembers = members.filter(member => member.role === (values.expenseType === "participant" ? "participante" : values.expenseType));
+  const responsibleMembers = members.filter(member => member.expenseOwnerType === (values.expenseType === "participant" ? "participante" : values.expenseType));
   return <><Cell><input value={values.incurredOn} onChange={event => onChange({ incurredOn: event.target.value, reportingMonth: event.target.value.slice(0, 7) || values.reportingMonth })} type="date" className="grid-input min-w-[135px]" /></Cell><Cell><input value={values.description} onChange={event => onChange({ description: event.target.value })} placeholder="Descripción" className="grid-input min-w-[250px]" /></Cell><Cell><select value={values.categoryId} onChange={event => onChange({ categoryId: event.target.value })} className="grid-input min-w-[150px]"><option value="">Categoría…</option>{categories.map(category => <option key={category.id} value={category.id}>{category.label}</option>)}</select></Cell><Cell><select value={values.expenseType} onChange={event => onChange({ expenseType: event.target.value as ExpenseType, chargedToUserId: "" })} className="grid-input min-w-[160px]">{getVisibleTypes(userRole).map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></Cell><Cell>{values.expenseType === "global_shared" ? <span className="text-xs text-slate-500">Proyecto / Compartido</span> : isPrivileged ? <select value={values.chargedToUserId} onChange={event => onChange({ chargedToUserId: event.target.value })} className="grid-input min-w-[170px]"><option value="">Responsable…</option>{responsibleMembers.map(member => <option key={member.id} value={member.id}>{memberDisplayName(member)}</option>)}</select> : <span className="text-xs text-slate-500">Tu cuenta</span>}</Cell><Cell><input value={values.amount} onChange={event => onChange({ amount: event.target.value })} type="number" min="0.01" step="0.01" placeholder="0.00" className="grid-input min-w-[110px] text-right" /></Cell></>;
 }
 
@@ -320,7 +327,7 @@ function ExpenseDialog({ onClose, month, userRole, isPrivileged, categories, mem
   const [file, setFile] = useState<File | null>(initialFile ?? null);
   const [aiNote, setAiNote] = useState<{ confidence: number; notes: string; model: string } | null>(null);
   const isSaving = createExpense.isPending || updateExpense.isPending || uploadInvoice.isPending || submitExpense.isPending;
-  const responsibleMembers = useMemo(() => members.filter(member => member.role === (values.expenseType === "participant" ? "participante" : values.expenseType)), [members, values.expenseType]);
+  const responsibleMembers = useMemo(() => members.filter(member => member.expenseOwnerType === (values.expenseType === "participant" ? "participante" : values.expenseType)), [members, values.expenseType]);
 
   const applyInvoiceExtraction = async (nextFile: File) => {
     if (!allowedMimes.includes(nextFile.type as (typeof allowedMimes)[number])) { toast.error("Adjunta un JPG, PNG o PDF de hasta 10 MB."); return; }

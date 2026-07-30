@@ -33,6 +33,7 @@ import {
 } from "../shared/expenseConstants";
 import { expenseDateSchema, reportingMonthSchema } from "../shared/expenseSchemas";
 import { extractInvoiceExpense } from "./invoiceExtraction";
+import { expectedExpenseOwnerType } from "./identityProfiles";
 
 const projectRoles = ["socio_1", "socio_2", "participante", "contador", "admin"] as const;
 const privilegedRoles = ["contador", "admin"] as const;
@@ -116,11 +117,11 @@ async function resolveChargedToUserId(
   }
 
   const chargedToUser = (await listProjectUsers()).find(user => user.id === chargedToUserId);
-  const expectedRole = expenseType === "participant" ? "participante" : expenseType;
-  if (!chargedToUser || chargedToUser.role !== expectedRole) {
+  const expectedOwnerType = expectedExpenseOwnerType(expenseType);
+  if (!chargedToUser || chargedToUser.expenseOwnerType !== expectedOwnerType) {
     throw new TRPCError({
       code: "BAD_REQUEST",
-      message: "La persona responsable debe coincidir con el tipo de gasto seleccionado.",
+      message: "La persona responsable debe coincidir con el titular del tipo de gasto seleccionado.",
     });
   }
   return chargedToUserId;

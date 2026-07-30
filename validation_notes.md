@@ -64,3 +64,11 @@ La carga real de `PRUEBA1.jpeg` se completó dentro del formulario autenticado s
 - El nuevo lenguaje se aplicó a la navegación, cabeceras, resumen, gastos, reportes, auditoría, equipo y roles. La cuadrícula conserva sus funciones existentes de edición, color y desplazamiento horizontal; los estados, permisos y flujos no se modificaron.
 - Se revisaron `/gastos`, `/reportes`, `/auditoria` y `/equipo` en escritorio, y `/gastos`, `/auditoria` y `/equipo` en móvil. Las superficies, jerarquía, acciones y campos se conservaron legibles en ambos tamaños. Las tablas siguen ofreciendo desplazamiento horizontal cuando el contenido supera el ancho móvil.
 - La verificación final `pnpm check && pnpm test && pnpm build` completó correctamente: 21 pruebas en 8 archivos, TypeScript sin errores y compilación de producción exitosa. Permanece únicamente la advertencia no bloqueante del empaquetador sobre el tamaño del bundle principal.
+
+## Identidades operativas y permisos — 30 de julio de 2026
+
+- Se configuró **Ing. Raymond Angomas** (`ingangomas@gmail.com`) como Administrador y titular de **Gastos Ing. Raymond**. Conserva el acceso completo del proyecto.
+- Se preasignó **Ing. Johan Nuñez** (`ing.johannunez@gmail.com`) como Administrador y titular de **Gastos Ing. Johan**. Al iniciar sesión con ese correo, su perfil autorizado sustituirá de forma segura la identidad provisional y conservará ambos atributos.
+- Se preasignó **Lic. Juan Isidro Caraballo** (`contabilidad@constructoraangote.com`) como Contador. Puede crear, editar, revisar y asignar gastos para ambos titulares, sin quedar asociado a una categoría personal de gastos.
+- Se separó el permiso de acceso de la titularidad de gasto mediante `expenseOwnerType`. Con ello, Raymond y Johan mantienen acceso administrativo sin perder el vínculo correcto para la asignación de sus gastos; el Contador puede seleccionar a cualquiera de ellos al crear o editar un registro.
+- La vista `/equipo` muestra los tres nombres, correos, accesos y titulares de gasto. Johan y Juan aparecen como **Pendiente de primer acceso**, evitando atribuirles un inicio de sesión que no ha ocurrido. La suite final completó **25 pruebas en 9 archivos**, TypeScript sin errores y una compilación de producción correcta.

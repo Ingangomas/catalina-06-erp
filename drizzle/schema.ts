@@ -31,13 +31,34 @@ export const users = mysqlTable("users", {
   role: mysqlEnum("role", ["user", "socio_1", "socio_2", "participante", "contador", "admin"])
     .default("user")
     .notNull(),
+  expenseOwnerType: mysqlEnum("expenseOwnerType", ["socio_1", "socio_2", "participante"]),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
 });
 
+/**
+ * Identidades autorizadas por correo. Al iniciar sesión, el perfil aplica el
+ * acceso del proyecto y, cuando corresponde, la persona a quien se cargan gastos.
+ */
+export const projectIdentityProfiles = mysqlTable(
+  "project_identity_profiles",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    email: varchar("email", { length: 320 }).notNull(),
+    displayName: varchar("displayName", { length: 120 }).notNull(),
+    role: mysqlEnum("role", ["socio_1", "socio_2", "participante", "contador", "admin"]).notNull(),
+    expenseOwnerType: mysqlEnum("expenseOwnerType", ["socio_1", "socio_2", "participante"]),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  table => [uniqueIndex("project_identity_profiles_email_unique").on(table.email)],
+);
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
+export type ProjectIdentityProfile = typeof projectIdentityProfiles.$inferSelect;
+export type InsertProjectIdentityProfile = typeof projectIdentityProfiles.$inferInsert;
 
 export const expenseCategories = mysqlTable(
   "expense_categories",

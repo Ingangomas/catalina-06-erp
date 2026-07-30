@@ -48,7 +48,10 @@ const updateInput = {
 describe("expenses.update", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    dbMocks.listProjectUsers.mockResolvedValue([{ id: 12, role: "socio_1" }]);
+    dbMocks.listProjectUsers.mockResolvedValue([
+      { id: 12, role: "admin", expenseOwnerType: "socio_1" },
+      { id: 13, role: "admin", expenseOwnerType: "socio_2" },
+    ]);
   });
 
   it("rechaza que un socio edite un gasto aprobado", async () => {
@@ -82,6 +85,22 @@ describe("expenses.update", () => {
         description: "Compra de cemento ajustada",
         amount: "2450.00",
       }),
+    );
+  });
+
+  it("permite al Contador asignar un gasto al titular Johan aunque su acceso sea administrativo", async () => {
+    dbMocks.getExpenseOwnership.mockResolvedValue({
+      id: 42,
+      createdByUserId: 13,
+      chargedToUserId: 13,
+      status: "submitted",
+    });
+
+    const caller = appRouter.createCaller(context("contador"));
+    await expect(caller.expenses.update({ ...updateInput, expenseId: 42, expenseType: "socio_2", chargedToUserId: 13 })).resolves.toEqual({ success: true });
+    expect(dbMocks.updateExpenseRecord).toHaveBeenCalledWith(
+      42,
+      expect.objectContaining({ chargedToUserId: 13, expenseType: "socio_2", changedByUserId: 90 }),
     );
   });
 

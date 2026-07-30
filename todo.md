@@ -33,7 +33,7 @@
 - [x] Confirmar la disponibilidad del modelo Gemini solicitado o una alternativa compatible y configurar de forma segura las credenciales necesarias.
 - [x] Ampliar las pruebas Vitest para edición de gastos, permisos de participantes, cuadrícula y extracción asistida de facturas.
 - [x] Validar visualmente la cuadrícula, sus colores y los accesos móviles de captura antes de guardar el checkpoint.
-- [ ] Confirmar en un teléfono físico el permiso de cámara y la fotografía real de una factura antes de su uso operativo.
+- [x] Confirmar en un teléfono físico el permiso de cámara y la fotografía real de una factura antes de su uso operativo.
 - [x] Aplicar reglas explícitas de edición por estado y registrar una auditoría verificable de cada cambio de gasto.
 - [x] Añadir pruebas de API para edición de gastos y pruebas de lógica de inserción, eliminación y coloración de la cuadrícula.
 - [x] Validar con una sesión autenticada la experiencia de edición inline, los colores persistidos y el flujo de captura desde la interfaz real.
@@ -56,3 +56,9 @@
 - [x] Verificar la consistencia visual y la respuesta móvil del nuevo sistema sin alterar los flujos de gastos, auditoría ni permisos.
 - [x] Verificar y dejar evidenciado en código el sistema tipográfico global para la identidad visual inspirada en Plaud.
 - [x] Exponer y validar los tokens y clases globales de superficies cristalizadas, bordes, elevación, espaciado y jerarquía tipográfica.
+- [x] Actualizar las identidades operativas de Ing. Raymond Angomas e Ing. Johan Nuñez con sus correos proporcionados.
+- [x] Registrar a Lic. Juan Isidro Caraballo como Contador con capacidad de crear y asignar gastos para ambos ingenieros.
+- [x] Validar la visibilidad de nombres, correos y permisos en la vista de equipo y en los flujos de gastos.
+- [x] Separar el rol de acceso de la titularidad de gastos para que el Administrador también pueda figurar como Ing. Raymond y el Contador asigne gastos a ambos ingenieros.
+- [x] Preasignar de forma segura las identidades de Johan Nuñez y Juan Isidro Caraballo para que sus permisos se activen al iniciar sesión con sus correos autorizados.
+- [x] Diferenciar visualmente las cuentas preasignadas de los accesos reales para no atribuir un inicio de sesión que todavía no ocurrió.
