@@ -62,3 +62,15 @@
 - [x] Separar el rol de acceso de la titularidad de gastos para que el Administrador también pueda figurar como Ing. Raymond y el Contador asigne gastos a ambos ingenieros.
 - [x] Preasignar de forma segura las identidades de Johan Nuñez y Juan Isidro Caraballo para que sus permisos se activen al iniciar sesión con sus correos autorizados.
 - [x] Diferenciar visualmente las cuentas preasignadas de los accesos reales para no atribuir un inicio de sesión que todavía no ocurrió.
+- [x] Implementar la exportación por período de facturas y fotografías archivadas en un paquete descargable.
+- [x] Aplicar a la exportación los mismos permisos de visibilidad que a los gastos y evidencias individuales.
+- [x] Añadir un control claro de descarga con estados de carga, vacío y error recuperable.
+- [x] Cubrir con pruebas la autorización y la composición segura del paquete de evidencias.
+- [x] Incluir el reporte del mes seleccionado dentro del paquete mensual, junto con un inventario de sus evidencias.
+- [x] Organizar fotografías y facturas en carpetas inequívocas por período, como `julio-2026`, `agosto-2026` y `septiembre-2026`, sin modificar los archivos archivados.
+- [x] Mostrar en la interfaz el nombre legible de la carpeta mensual que se generará dentro del paquete.
+- [ ] Exportar un respaldo completo de la base de datos MySQL y la estructura de archivos S3 para asegurar una migración sin pérdida de datos.
+- [ ] Configurar la adaptación de Drizzle ORM y esquemas de base de datos para PostgreSQL (Supabase).
+- [ ] Crear el repositorio de Git e inicializar la estructura portable lista para Vercel.
+- [ ] Configurar las variables de entorno para Vercel y Supabase.
+- [ ] Validar la compilación, autenticación y despliegue del proyecto migrado.
