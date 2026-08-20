@@ -69,8 +69,8 @@
 - [x] Incluir el reporte del mes seleccionado dentro del paquete mensual, junto con un inventario de sus evidencias.
 - [x] Organizar fotografías y facturas en carpetas inequívocas por período, como `julio-2026`, `agosto-2026` y `septiembre-2026`, sin modificar los archivos archivados.
 - [x] Mostrar en la interfaz el nombre legible de la carpeta mensual que se generará dentro del paquete.
-- [ ] Exportar un respaldo completo de la base de datos MySQL y la estructura de archivos S3 para asegurar una migración sin pérdida de datos.
-- [ ] Configurar la adaptación de Drizzle ORM y esquemas de base de datos para PostgreSQL (Supabase).
-- [ ] Crear el repositorio de Git e inicializar la estructura portable lista para Vercel.
-- [ ] Configurar las variables de entorno para Vercel y Supabase.
-- [ ] Validar la compilación, autenticación y despliegue del proyecto migrado.
+- [ ] Generar y guardar un respaldo verificable de MySQL (dump) y un inventario/export de las evidencias S3 antes de la migración.
+- [ ] Completar la adaptación real a PostgreSQL/Supabase: conexión Drizzle, migraciones generadas/aplicadas y validación del servidor contra Postgres.
+- [ ] Configurar de forma efectiva las variables de entorno en Vercel y Supabase cuando se disponga de las credenciales del usuario.
+- [ ] Desplegar el proyecto en Vercel conectado a Supabase y validar autenticación, compilación y flujos críticos en el entorno migrado.
+- [ ] Crear el repositorio GitHub, proyecto Supabase y proyecto Vercel autorizados por el usuario para la migración.
