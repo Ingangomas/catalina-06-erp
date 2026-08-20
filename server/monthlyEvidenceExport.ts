@@ -1,5 +1,8 @@
 import { generatePolarsReport } from "./reporting";
 import { storageGetSignedUrl, storagePut } from "./storage";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+
 
 type MonthlyInvoice = {
   id: number;
@@ -127,9 +130,9 @@ export async function createMonthlyEvidenceExport(input: { month: string; record
   })) as { filename: string; csv: string; summary: unknown };
   const inventory = buildMonthlyEvidenceInventory(input.records, input.month);
   const rootFolder = `catalina-06-${monthlyFolderName(input.month)}`;
-  const archiverModule = await import("archiver");
-  const archiverFn = (archiverModule as unknown as { default?: any }).default || archiverModule;
-  const archive = (archiverFn as any)("zip", { zlib: { level: 9 } });
+  const archiverMod = (await import("archiver")) as any;
+  const archiverFn = typeof archiverMod === "function" ? archiverMod : (archiverMod.default || archiverMod.create || archiverMod);
+  const archive = archiverFn("zip", { zlib: { level: 9 } });
   const chunks: Buffer[] = [];
 
   const archiveBuffer = new Promise<Buffer>((resolve, reject) => {
