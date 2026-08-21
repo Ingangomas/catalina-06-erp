@@ -14,6 +14,10 @@
       "src": "server/api/router-probe.ts",
       "use": "@vercel/node"
     },
+    { "src": "server/api/db-probe.ts", "use": "@vercel/node" },
+    { "src": "server/api/reporting-probe.ts", "use": "@vercel/node" },
+    { "src": "server/api/invoice-probe.ts", "use": "@vercel/node" },
+    { "src": "server/api/system-probe.ts", "use": "@vercel/node" },
     {
       "src": "package.json",
       "use": "@vercel/static-build",
@@ -24,6 +28,10 @@
   ],
   "rewrites": [
     { "source": "/api/router-probe", "destination": "/server/api/router-probe.ts" },
+    { "source": "/api/db-probe", "destination": "/server/api/db-probe.ts" },
+    { "source": "/api/reporting-probe", "destination": "/server/api/reporting-probe.ts" },
+    { "source": "/api/invoice-probe", "destination": "/server/api/invoice-probe.ts" },
+    { "source": "/api/system-probe", "destination": "/server/api/system-probe.ts" },
     { "source": "/api/:path*", "destination": "/server/api/index.ts" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
