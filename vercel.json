@@ -5,7 +5,10 @@
   "builds": [
     {
       "src": "server/api/index.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["server/**", "shared/**", "drizzle/**", "scripts/**"]
+      }
     },
     {
       "src": "package.json",
