@@ -12,6 +12,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/bootstrap.ts",
+      "use": "@vercel/node"
+    },
+    {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -21,6 +25,7 @@
   ],
   "rewrites": [
     { "source": "/api/health", "destination": "/api/health.ts" },
+    { "source": "/api/bootstrap", "destination": "/api/bootstrap.ts" },
     { "source": "/api/:path*", "destination": "/api/index.ts" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
