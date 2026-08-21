@@ -1,0 +1,5 @@
+{
+  "release": "vercel-api-routing-v3",
+  "purpose": "diagnóstico de despliegue",
+  "apiExpectedPath": "/api/trpc/auth.me"
+}
