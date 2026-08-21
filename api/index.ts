@@ -1,24 +1,7 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
+import { createApp } from "../server/_core/app";
 
-type ExpressHandler = (req: IncomingMessage, res: ServerResponse) => void;
-let appPromise: Promise<ExpressHandler> | undefined;
+// La importación estática garantiza que @vercel/node empaquete la aplicación
+// Express y todos sus módulos necesarios dentro de la función.
+const app = createApp();
 
-async function getApp() {
-  appPromise ??= import("../server/_core/app").then(({ createApp }) => createApp() as unknown as ExpressHandler);
-  return appPromise;
-}
-
-// Punto de entrada para @vercel/node. La carga diferida permite devolver un
-// diagnóstico controlado si una dependencia de producción no inicia.
-export default async function handler(req: IncomingMessage, res: ServerResponse) {
-  try {
-    const app = await getApp();
-    return app(req, res);
-  } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error);
-    console.error("[Vercel API] Bootstrap failed", error);
-    res.statusCode = 500;
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.end(JSON.stringify({ error: "API bootstrap failed", detail }));
-  }
-}
+export default app;
