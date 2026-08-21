@@ -6,21 +6,6 @@ const reportingMocks = vi.hoisted(() => ({ generatePolarsReport: vi.fn() }));
 vi.mock("./storage", () => storageMocks);
 vi.mock("./reporting", () => reportingMocks);
 
-vi.mock("archiver", () => {
-  const mInstance = {
-    on: vi.fn((event, cb) => {
-      if (event === "end") {
-        setTimeout(cb, 10);
-      }
-      return mInstance;
-    }),
-    append: vi.fn(),
-    finalize: vi.fn().mockResolvedValue(undefined),
-  };
-  const mArchiver = vi.fn(() => mInstance);
-  return { default: mArchiver };
-});
-
 import {
   buildMonthlyEvidenceInventory,
   createMonthlyEvidenceExport,
