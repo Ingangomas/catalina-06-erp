@@ -74,3 +74,5 @@
 - [ ] Configurar de forma efectiva las variables de entorno en Vercel y Supabase cuando se disponga de las credenciales del usuario.
 - [ ] Desplegar el proyecto en Vercel conectado a Supabase y validar autenticación, compilación y flujos críticos en el entorno migrado.
 - [ ] Crear el repositorio GitHub, proyecto Supabase y proyecto Vercel autorizados por el usuario para la migración.
+- [ ] Resolver la autorización de Vercel sobre el repositorio privado de GitHub sin duplicar ni eliminar la conexión de inicio de sesión existente.
+- [ ] Alinear la versión y configuración de pnpm con el archivo de bloqueo para que Vercel pueda instalar dependencias sin errores.
