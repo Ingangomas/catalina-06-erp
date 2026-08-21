@@ -8,6 +8,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/health.ts",
+      "use": "@vercel/node"
+    },
+    {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -16,6 +20,7 @@
     }
   ],
   "rewrites": [
+    { "source": "/api/health", "destination": "/api/health.ts" },
     { "source": "/api/:path*", "destination": "/api/index.ts" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
