@@ -76,3 +76,4 @@
 - [ ] Crear el repositorio GitHub, proyecto Supabase y proyecto Vercel autorizados por el usuario para la migración.
 - [ ] Resolver la autorización de Vercel sobre el repositorio privado de GitHub sin duplicar ni eliminar la conexión de inicio de sesión existente.
 - [ ] Alinear la versión y configuración de pnpm con el archivo de bloqueo para que Vercel pueda instalar dependencias sin errores.
+- [ ] Adaptar el servidor Express, tRPC, carga S3 y autenticación al modelo de funciones sin servidor de Vercel antes del despliegue final.

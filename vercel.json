@@ -1,21 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
   "installCommand": "corepack enable && corepack pnpm install --frozen-lockfile",
-  "builds": [
-    {
-      "src": "server/_core/index.ts",
-      "use": "@vercel/node"
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist/public",
+  "functions": {
+    "api/[...path].ts": {
+      "maxDuration": 60
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "server/_core/index.ts"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "dist/public/$1"
-    }
-  ]
+  }
 }
