@@ -14,6 +14,7 @@
       "src": "server/api/router-probe.ts",
       "use": "@vercel/node"
     },
+    { "src": "api/db-probe.ts", "use": "@vercel/node" },
     { "src": "server/api/db-probe.ts", "use": "@vercel/node" },
     { "src": "server/api/reporting-probe.ts", "use": "@vercel/node" },
     { "src": "server/api/invoice-probe.ts", "use": "@vercel/node" },
@@ -28,6 +29,7 @@
   ],
   "rewrites": [
     { "source": "/api/router-probe", "destination": "/server/api/router-probe.ts" },
+    { "source": "/api/standard-db-probe", "destination": "/api/db-probe.ts" },
     { "source": "/api/db-probe", "destination": "/server/api/db-probe.ts" },
     { "source": "/api/reporting-probe", "destination": "/server/api/reporting-probe.ts" },
     { "source": "/api/invoice-probe", "destination": "/server/api/invoice-probe.ts" },
