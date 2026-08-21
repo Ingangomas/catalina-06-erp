@@ -1,8 +1,5 @@
 import { generatePolarsReport } from "./reporting";
 import { storageGetSignedUrl, storagePut } from "./storage";
-import { createRequire } from "node:module";
-const require = createRequire(import.meta.url);
-
 
 type MonthlyInvoice = {
   id: number;
