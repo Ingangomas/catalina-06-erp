@@ -34,7 +34,6 @@ import {
 import { expenseDateSchema, reportingMonthSchema } from "../shared/expenseSchemas";
 import { extractInvoiceExpense } from "./invoiceExtraction";
 import { expectedExpenseOwnerType } from "./identityProfiles";
-import { createMonthlyEvidenceExport } from "./monthlyEvidenceExport";
 
 const projectRoles = ["socio_1", "socio_2", "participante", "contador", "admin"] as const;
 const privilegedRoles = ["contador", "admin"] as const;
@@ -436,6 +435,7 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         requireAssignedProjectRole(ctx.user.role);
         const records = await listExpenseRecords(accessibleExpenseFilters(ctx.user.role, ctx.user.id, input.month));
+        const { createMonthlyEvidenceExport } = await import("./monthlyEvidenceExport");
         return createMonthlyEvidenceExport({ month: input.month, records });
       }),
   }),
