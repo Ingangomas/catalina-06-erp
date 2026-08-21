@@ -15,9 +15,8 @@
       }
     }
   ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/api/(.*)", "dest": "/api/index.ts" },
-    { "src": "/(.*)", "dest": "/dist/public/index.html" }
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index.ts" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
