@@ -1,11 +1,23 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
   "installCommand": "npx --yes pnpm@10.4.1 install --frozen-lockfile",
-  "buildCommand": "npx --yes pnpm@10.4.1 build",
-  "outputDirectory": "dist/public",
-  "functions": {
-    "api/[...path].ts": {
-      "maxDuration": 60
+  "builds": [
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/public"
+      }
     }
-  }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/api/(.*)", "dest": "/api/index.ts" },
+    { "src": "/(.*)", "dest": "/dist/public/index.html" }
+  ]
 }
