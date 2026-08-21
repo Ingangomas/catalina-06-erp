@@ -77,3 +77,5 @@
 - [ ] Resolver la autorización de Vercel sobre el repositorio privado de GitHub sin duplicar ni eliminar la conexión de inicio de sesión existente.
 - [ ] Alinear la versión y configuración de pnpm con el archivo de bloqueo para que Vercel pueda instalar dependencias sin errores.
 - [ ] Adaptar el servidor Express, tRPC, carga S3 y autenticación al modelo de funciones sin servidor de Vercel antes del despliegue final.
+- [ ] Diagnosticar y corregir iterativamente el despliegue de Vercel hasta obtener una URL funcional o documentar el bloqueo externo verificable.
+- [ ] Forzar desde el repositorio una instalación exacta de pnpm compatible con el archivo de bloqueo, sin depender de Corepack ni de una sesión de Vercel.
