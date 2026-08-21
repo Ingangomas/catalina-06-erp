@@ -80,3 +80,4 @@
 - [ ] Diagnosticar y corregir iterativamente el despliegue de Vercel hasta obtener una URL funcional o documentar el bloqueo externo verificable.
 - [x] Forzar desde el repositorio una instalación exacta de pnpm compatible con el archivo de bloqueo, sin depender de Corepack ni de una sesión de Vercel.
 - [ ] Corregir el enrutamiento de la función `/api` de Vercel para que tRPC, autenticación y almacenamiento no respondan 404.
+- [ ] Configurar las variables seguras de base de datos, autenticación y almacenamiento que requiere la función API de Vercel.
