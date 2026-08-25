@@ -12,6 +12,7 @@ import {
   monthlyExportFileName,
   monthlyFolderName,
 } from "./monthlyEvidenceExport";
+import * as unzipper from "unzipper";
 
 describe("exportación mensual de evidencias", () => {
   beforeEach(() => {
@@ -93,6 +94,22 @@ describe("exportación mensual de evidencias", () => {
       expect.any(Buffer),
       "application/zip",
     );
+    const zip = storageMocks.storagePut.mock.calls[0]?.[1] as Buffer;
+    const directory = await unzipper.Open.buffer(zip);
+    const archivePaths = directory.files.map(file => file.path).sort();
+    const root = "catalina-06-julio-2026";
+    expect(archivePaths).toEqual(expect.arrayContaining([
+      `${root}/LEEME.txt`,
+      `${root}/inventario-evidencias.json`,
+      `${root}/reporte/catalina-06-gastos-2026-07.csv`,
+      `${root}/evidencias/julio-2026/2026-07-03__gasto-41__Cemento__factura-9__factura.jpeg`,
+    ]));
+    const evidenceEntry = directory.files.find(file => file.path.endsWith("factura-9__factura.jpeg"));
+    const inventoryEntry = directory.files.find(file => file.path.endsWith("inventario-evidencias.json"));
+    expect(await evidenceEntry?.buffer()).toEqual(Buffer.from([1, 2, 3, 4]));
+    expect((await inventoryEntry?.buffer())?.toString("utf8")).toContain("evidencias/julio-2026/");
+    expect(storageMocks.storageGetSignedUrl).toHaveBeenCalledTimes(2);
+    expect(storageMocks.storagePut).toHaveBeenCalledTimes(1);
     expect(result).toMatchObject({ filename: "catalina-06-reporte-evidencias-2026-07.zip", evidenceCount: 1, url: "https://example.com/exportacion.zip" });
   });
 });

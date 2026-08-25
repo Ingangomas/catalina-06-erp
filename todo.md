@@ -69,6 +69,10 @@
 - [x] Incluir el reporte del mes seleccionado dentro del paquete mensual, junto con un inventario de sus evidencias.
 - [x] Organizar fotografías y facturas en carpetas inequívocas por período, como `julio-2026`, `agosto-2026` y `septiembre-2026`, sin modificar los archivos archivados.
 - [x] Mostrar en la interfaz el nombre legible de la carpeta mensual que se generará dentro del paquete.
+- [x] Mostrar un estado vacío específico cuando el mes seleccionado no tenga facturas ni fotografías archivadas para exportar.
+- [x] Ofrecer una recuperación visible ante errores de exportación mensual sin perder el período elegido.
+- [x] Inspeccionar automáticamente el ZIP generado para verificar el reporte, inventario, carpeta mensual y evidencias incluidas.
+- [x] Documentar que la exportación lee copias de S3 y no modifica ni elimina los archivos archivados de origen.
 - [ ] Generar y guardar un respaldo verificable de MySQL (dump) y un inventario/export de las evidencias S3 antes de la migración.
 - [ ] Completar la adaptación real a PostgreSQL/Supabase: conexión Drizzle, migraciones generadas/aplicadas y validación del servidor contra Postgres.
 - [ ] Configurar de forma efectiva las variables de entorno en Vercel y Supabase cuando se disponga de las credenciales del usuario.
