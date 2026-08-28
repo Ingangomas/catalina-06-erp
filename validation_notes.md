@@ -87,3 +87,9 @@ La carga real de `PRUEBA1.jpeg` se completó dentro del formulario autenticado s
 - Se realizó un respaldo lógico no destructivo de MySQL antes de cualquier migración. La exportación válida se almacenó fuera del directorio desplegable del proyecto y tiene una huella SHA-256 registrada para comprobación de integridad.
 - Se exportó un inventario JSON independiente de las evidencias. El inventario contiene las 10 facturas y fotografías vinculadas, sus claves de S3, mes archivado, metadatos, gasto relacionado y estado; no descarga, altera ni elimina los archivos fuente.
 - La comprobación previa de volumen registró 3 usuarios, 3 perfiles autorizados, 5 categorías, 20 gastos, 10 evidencias, 3 aprobaciones, 35 eventos de auditoría y 1 preferencia de cuadrícula. Estos conteos servirán como controles de conciliación al migrar a PostgreSQL.
+
+## Publicación en Git — 25 de agosto de 2026
+
+- Se verificó el repositorio privado autorizado [Ingangomas/catalina-06-erp](https://github.com/Ingangomas/catalina-06-erp) y su rama principal `main` antes de la carga.
+- La revisión de cambios comprobó formato Git y detectó que no había credenciales, claves privadas ni valores sensibles dentro de la confirmación. Los respaldos generados permanecen fuera del directorio del proyecto y no se incluyeron en el repositorio.
+- Se publicó y verificó la confirmación `9984f17` (`feat: exportación mensual de evidencias y respaldos`). La referencia remota `main` quedó alineada con esa versión.
