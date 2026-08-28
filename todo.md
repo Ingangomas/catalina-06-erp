@@ -73,7 +73,10 @@
 - [x] Ofrecer una recuperación visible ante errores de exportación mensual sin perder el período elegido.
 - [x] Inspeccionar automáticamente el ZIP generado para verificar el reporte, inventario, carpeta mensual y evidencias incluidas.
 - [x] Documentar que la exportación lee copias de S3 y no modifica ni elimina los archivos archivados de origen.
-- [ ] Generar y guardar un respaldo verificable de MySQL (dump) y un inventario/export de las evidencias S3 antes de la migración.
+- [ ] Revisar el estado Git y las reglas de exclusión antes de publicar el código del proyecto.
+- [ ] Preparar una confirmación local que excluya credenciales, respaldos y archivos generados de la publicación.
+- [ ] Publicar el proyecto en el repositorio Git autorizado y verificar que la rama remota contiene la versión esperada.
+- [x] Generar y guardar un respaldo verificable de MySQL (dump) y un inventario/export de las evidencias S3 antes de la migración.
 - [ ] Completar la adaptación real a PostgreSQL/Supabase: conexión Drizzle, migraciones generadas/aplicadas y validación del servidor contra Postgres.
 - [ ] Configurar de forma efectiva las variables de entorno en Vercel y Supabase cuando se disponga de las credenciales del usuario.
 - [ ] Desplegar el proyecto en Vercel conectado a Supabase y validar autenticación, compilación y flujos críticos en el entorno migrado.

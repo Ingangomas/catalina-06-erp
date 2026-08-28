@@ -81,3 +81,9 @@ La carga real de `PRUEBA1.jpeg` se completó dentro del formulario autenticado s
 - El procedimiento reutiliza los filtros de visibilidad de gastos, por lo que cada usuario solo exporta las evidencias y registros que tiene permiso de consultar. Se mantiene el control de acceso de los socios, Contador y Administrador.
 - La interfaz confirma el número de evidencias empaquetadas, muestra un estado específico si el período no tiene facturas o fotografías y ofrece **Reintentar** ante un error sin cambiar el mes elegido.
 - La prueba `monthlyEvidenceExport.test.ts` ejecuta la creación real del ZIP, inspecciona sus entradas y verifica CSV, inventario, carpeta mensual, contenido de evidencia y que solo se consulte la fuente y se guarde el nuevo archivo. La validación final completó **30 pruebas en 11 archivos**, TypeScript sin errores y compilación de producción exitosa.
+
+## Preparación de respaldo para migración — 25 de agosto de 2026
+
+- Se realizó un respaldo lógico no destructivo de MySQL antes de cualquier migración. La exportación válida se almacenó fuera del directorio desplegable del proyecto y tiene una huella SHA-256 registrada para comprobación de integridad.
+- Se exportó un inventario JSON independiente de las evidencias. El inventario contiene las 10 facturas y fotografías vinculadas, sus claves de S3, mes archivado, metadatos, gasto relacionado y estado; no descarga, altera ni elimina los archivos fuente.
+- La comprobación previa de volumen registró 3 usuarios, 3 perfiles autorizados, 5 categorías, 20 gastos, 10 evidencias, 3 aprobaciones, 35 eventos de auditoría y 1 preferencia de cuadrícula. Estos conteos servirán como controles de conciliación al migrar a PostgreSQL.
